@@ -1,6 +1,6 @@
 # Usage
 
-!Important: must have scanpy, squidpy and anndata installed
+<b>Important</b>: must have scanpy, squidpy and anndata installed
 
 USE `spatial_data_importing_raw` only for RAW data
 USE `spatial_data_importing_filtered` only for FILTERED data
