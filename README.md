@@ -6,7 +6,7 @@ Import main module as: `from STDataAnalysis.python_file_name import func_name`
 
 ## DataImport.py
 
-USE `spatial_data_importing_raw` only for RAW data<br>
+USE `spatial_data_importing_raw` only for RAW data <br>
 USE `spatial_data_importing_filtered` only for FILTERED data
 
 ## FilterBYName.py
