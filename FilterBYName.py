@@ -3,7 +3,7 @@
 @author: Paulina Frolovaite
 
 `gene_starts` - identifier with what the gene name starts, for eg.: MT- for mitochondrials genes; INPUT: a string or a list of strings
-`variable_names` - a list of gene names/ids; INPUT: list
+`variable_names` - a list of gene names/ids; INPUT: list of strings
 """
 
 def filter_by_type_gene(gene_starts, variable_names: list):
