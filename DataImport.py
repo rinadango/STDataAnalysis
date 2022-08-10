@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 @author: Paulina Frolovaite
+
+Two main methods: spatial_data_importing_raw() and spatial_data_importing_filtered
 """
 
 import scanpy as sc
@@ -14,6 +16,78 @@ import numpy as np
 import json
 from PIL import Image
 from numpy import asarray
+
+# Paths to coordinate, scale factor and image files
+def _path_spatial_folder(spatial_folder_path):
+    file_list = ['tissue_positions_list.csv', 'scalefactors_json.json', 'tissue_hires_image.png']
+    new_pathS = []
+    for item in file_list:
+        paths = f"{spatial_folder_path}\\{item}"
+        new_path = paths.replace('\\','/')
+        new_pathS.append(new_path)
+    return new_pathS
+
+# Getting the spatial factors
+def _spatial_json(new_pathS):
+    
+    ### Opening JSON file
+    f = open(new_pathS[1])
+  
+    # returns JSON object as 
+    # a dictionary
+    data_scale = json.load(f)
+
+    # Closing file
+    f.close()
+
+    return data_scale
+
+# IMAGE 
+# GETTING IMAGE DATA IN NUMPY ARRAY
+def _image_import(new_pathS):
+
+    # load the image
+    II_image = Image.open(new_pathS[2])
+    # convert image to numpy array
+    image_data = asarray(II_image)
+
+    return image_data
+
+# Workaround the ANNDATA object
+def _anndata_object_workaround(library_id, data_spatial, coord_df, data_scale, image_data, spatial_folder_path):
+
+    # Key for ANNDATA .uns and .obsm
+    spatial_key = "spatial"
+
+    # Create dataset to add to ANNDATA.obs
+    csv_3colms = coord_df.iloc[:, 0:4]
+    csv_3colms = csv_3colms.set_index(csv_3colms.columns[0])
+    csv_3colms.index.name = None
+    csv_3colms.columns = ['in_tissue','array_row','array_col']
+    
+    # Get coordinates
+    csv_COORDS = coord_df.iloc[:, [5, 4]].values
+
+    # Add filtered out coordinates to ANNDATA.obsm
+    data_spatial.obsm[spatial_key] = csv_COORDS
+    
+    # Creating ANNDATA.uns
+    data_spatial.uns[spatial_key] = {library_id: {}}
+    data_spatial.uns[spatial_key][library_id]["images"] = {}
+
+    # Add scaling factors to ANNDATA.uns
+    data_spatial.uns[spatial_key][library_id]["scalefactors"] = data_scale
+    
+    # ADDING SOURCE IMAGE PATH TO ANNDATA.UNS
+    data_spatial.uns[spatial_key][library_id]['metadata'] = {'source_image_path': spatial_folder_path}
+    
+    # ADDING IMAGE DATA (NUMPY ARRAY) TO ANNDATA.UNS
+    data_spatial.uns[spatial_key][library_id]["images"] = {"hires": image_data}
+    
+    # ADD ['in_tissue','array_row','array_col'] to ANNDATA.OBS
+    data_spatial.obs = csv_3colms
+
+    return data_spatial
 
 """
 `library_id` - ID of the library; INPUT `string`
@@ -33,66 +107,21 @@ def spatial_data_importing_raw(library_id, data_path, spatial_folder_path):
     
     data_spatial.var_names_make_unique()
     
-    # Paths to coordinate, scale factor and image files
-    file_list = ['tissue_positions_list.csv', 'scalefactors_json.json', 'tissue_hires_image.png']
-    new_pathS = []
-    for item in file_list:
-        paths = f"{spatial_folder_path}\\{item}"
-        new_path = paths.replace('\\','/')
-        new_pathS.append(new_path)
+    # Get spatial folder path
+    new_pathS = _path_spatial_folder(spatial_folder_path)
     
     ### Import coordinates file
     coord_df = pd.read_csv(new_pathS[0], sep=',',header=None)
     
-    # Create data set to add to ANNDATA.obs
-    csv_3colms = coord_df.iloc[:, 0:4]
-    csv_3colms = csv_3colms.set_index(csv_3colms.columns[0])
-    csv_3colms.index.name = None
-    csv_3colms.columns = ['in_tissue','array_row','array_col']
+    # Read JSON
+    data_scale = _spatial_json(new_pathS)
     
-    # Get coordinates
-    csv_COORDS = coord_df.iloc[:, [5, 4]].values
+    # Import image data
+    image_data = _image_import(new_pathS)
     
-    # Key for ANNDATA .uns and .obsm
-    spatial_key = "spatial"
+    data_spatial = _anndata_object_workaround(library_id, data_spatial, coord_df,
+    data_scale, image_data, spatial_folder_path)
 
-    # Add filtered out coordinates to ANNDATA.obsm
-    data_spatial.obsm[spatial_key] = csv_COORDS
-
-    # Creating ANNDATA.uns
-    data_spatial.uns[spatial_key] = {library_id: {}}
-    data_spatial.uns[spatial_key][library_id]["images"] = {}
-    
-    ### Opening JSON file
-    f = open(new_pathS[1])
-  
-    # returns JSON object as 
-    # a dictionary
-    data_scale = json.load(f)
-    data_scale
-
-    # Closing file
-    f.close()
-    
-    # Add scaling factors to ANNDATA.uns
-    data_spatial.uns[spatial_key][library_id]["scalefactors"] = data_scale
-    
-    # ADDING SOURCE IMAGE PATH TO ANNDATA.UNS
-    data_spatial.uns[spatial_key][library_id]['metadata'] = {'source_image_path': spatial_folder_path}
-    
-    ### IMAGE 
-    ## GETTING IMAGE DATA IN NUMPY ARRAY
-    # load the image
-    II_image = Image.open(new_pathS[2])
-    # convert image to numpy array
-    image_data = asarray(II_image)
-    
-    # ADDING IMAGE DATA (NUMPY ARRAY) TO ANNDATA.UNS
-    data_spatial.uns[spatial_key][library_id]["images"] = {"hires": image_data}
-    
-    # ADD ['in_tissue','array_row','array_col'] to ANNDATA.OBS
-    data_spatial.obs = csv_3colms
-    
     return data_spatial
 
 
@@ -116,13 +145,8 @@ def spatial_data_importing_filtered(library_id, matrix, barcodes_filtered, featu
     # Fix shape
     data_spatial = data_spatial.transpose()
     
-    # Paths to coordinate, scale factor and image files
-    file_list = ['tissue_positions_list.csv', 'scalefactors_json.json', 'tissue_hires_image.png']
-    new_pathS = []
-    for item in file_list:
-        paths = f"{spatial_folder_path}\\{item}"
-        new_path = paths.replace('\\','/')
-        new_pathS.append(new_path)
+    # Get spatial folder path
+    new_pathS = _path_spatial_folder(spatial_folder_path)
     
     ### Importing
     # Import coordinates file
@@ -134,59 +158,20 @@ def spatial_data_importing_filtered(library_id, matrix, barcodes_filtered, featu
         featureS = [line.strip() for line in f]
         f.close()
         
-    # Filter coordinates file based on barcodes file
-    filtered_out_csv = pd.merge(coord_df, barcodes_filtered_df, how='inner')
-    
-    # Create data set to add to ANNDATA.obs
-    filtered_out_csv_3colms = filtered_out_csv.iloc[:, 0:4]
-    filtered_out_csv_3colms = filtered_out_csv_3colms.set_index(filtered_out_csv_3colms.columns[0])
-    filtered_out_csv_3colms.index.name = None
-    filtered_out_csv_3colms.columns = ['in_tissue','array_row','array_col']
-    
-    # Get filtered out coordinates
-    filtered_out_csv_COORDS = filtered_out_csv.iloc[:, [5, 4]].values
-    
     # Creating ANNDATA.var
     data_spatial.var_names = featureS
-    
-    # Key for ANNDATA .uns and .obsm
-    spatial_key = "spatial"
-    
-    # Add filtered out coordinates to ANNDATA.obsm
-    data_spatial.obsm[spatial_key] = filtered_out_csv_COORDS
-    
-    # Creating ANNDATA.uns
-    data_spatial.uns[spatial_key] = {library_id: {}}
-    data_spatial.uns[spatial_key][library_id]["images"] = {}
-    
-    ### Opening JSON file
-    f = open(new_pathS[1])
-  
-    # returns JSON object as 
-    # a dictionary
-    data_scale = json.load(f)
-    data_scale
 
-    # Closing file
-    f.close()
-    
-    # Add scaling factors to ANNDATA.uns
-    data_spatial.uns[spatial_key][library_id]["scalefactors"] = data_scale
-    
-    # ADDING SOURCE IMAGE PATH TO ANNDATA.UNS
-    data_spatial.uns[spatial_key][library_id]['metadata'] = {'source_image_path': spatial_folder_path}
-    
-    ### IMAGE 
-    ## GETTING IMAGE DATA IN NUMPY ARRAY
-    # load the image
-    II_image = Image.open(new_pathS[2])
-    # convert image to numpy array
-    image_data = asarray(II_image)
-    
-    # ADDING IMAGE DATA (NUMPY ARRAY) TO ANNDATA.UNS
-    data_spatial.uns[spatial_key][library_id]["images"] = {"hires": image_data}
-    
+    # Filter coordinates file based on barcodes file
+    filtered_out_csv = pd.merge(coord_df, barcodes_filtered_df, how='inner')
+
+    # Read JSON
+    data_scale = _spatial_json(new_pathS)
+  
+    # Import image data
+    image_data = _image_import(new_pathS)
+   
     # ADD ['in_tissue','array_row','array_col'] to ANNDATA.OBS
-    data_spatial.obs = filtered_out_csv_3colms
+    data_spatial = _anndata_object_workaround(library_id, data_spatial, filtered_out_csv,
+    data_scale, image_data, spatial_folder_path)
     
     return data_spatial
