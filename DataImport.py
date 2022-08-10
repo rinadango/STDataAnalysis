@@ -53,11 +53,13 @@ def spatial_data_importing_raw(library_id, data_path, spatial_folder_path):
     # Get coordinates
     csv_COORDS = coord_df.iloc[:, [5, 4]].values
     
-    # Add filtered out coordinates to ANNDATA.obsm
-    data_spatial.obsm["spatial"] = csv_COORDS
-    
-    # Creating ANNDATA.uns
+    # Key for ANNDATA .uns and .obsm
     spatial_key = "spatial"
+
+    # Add filtered out coordinates to ANNDATA.obsm
+    data_spatial.obsm[spatial_key] = csv_COORDS
+
+    # Creating ANNDATA.uns
     data_spatial.uns[spatial_key] = {library_id: {}}
     data_spatial.uns[spatial_key][library_id]["images"] = {}
     
