@@ -1,7 +1,7 @@
 # Usage
 
-<b>Important</b>: must have scanpy, squidpy and anndata installed for `DataImport.py`
-Add the folder where you will use it as import for other code
+<b>Important</b>: must have scanpy, squidpy and anndata installed for `DataImport.py`<p>
+Add the folder where you will use it as import for other code<br>
 Import main module as: `from STDataAnalysis.python_file_name import func_name`
 
 ## DataImport.py
