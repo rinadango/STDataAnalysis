@@ -98,6 +98,8 @@ def _anndata_object_workaround(library_id, data_spatial, coord_df, data_scale, i
 For WIN: it is important to change the `\` to `/` or `\\`, or add `r` at the begining of the `string`. RECOMMENDATION: to add the `r` at the begining of the `string`
     
 ### USE `spatial_data_importing_raw()` only for RAW data
+
+### Only takes high resolution image for now
 """
 
 def spatial_data_importing_raw(library_id, data_path, spatial_folder_path):
@@ -137,6 +139,8 @@ def spatial_data_importing_raw(library_id, data_path, spatial_folder_path):
 For WIN: it is important to change the `\` to `/` or `\\`, or add `r` at the begining of the `string`. RECOMMENDATION: to add the `r` at the begining of the `string`
     
 ### USE `spatial_data_importing_filtered()` only for FILTERED data
+
+### Only takes in high resolution image for now
 """
 
 def spatial_data_importing_filtered(library_id, matrix, barcodes_filtered, feature_file, spatial_folder_path):
