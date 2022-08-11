@@ -119,6 +119,7 @@ def spatial_data_importing_raw(library_id, data_path, spatial_folder_path):
     # Import image data
     image_data = _image_import(new_pathS)
     
+    # Add everything into ANNDATA object
     data_spatial = _anndata_object_workaround(library_id, data_spatial, coord_df,
     data_scale, image_data, spatial_folder_path)
 
@@ -170,7 +171,7 @@ def spatial_data_importing_filtered(library_id, matrix, barcodes_filtered, featu
     # Import image data
     image_data = _image_import(new_pathS)
    
-    # ADD ['in_tissue','array_row','array_col'] to ANNDATA.OBS
+    # Add everything into ANNDATA object
     data_spatial = _anndata_object_workaround(library_id, data_spatial, filtered_out_csv,
     data_scale, image_data, spatial_folder_path)
     
