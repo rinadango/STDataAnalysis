@@ -3,7 +3,7 @@
 @author: Paulina Frolovaite
 
 `gene_starts` - identifier with what the gene name starts, for eg.: MT- for mitochondrials genes; INPUT: a string or a list of strings
-`anndata_object` - the imported data set in an anndata object having features
+`anndata_object` - the imported data set in an anndata object with features
 """
 
 def filter_by_type_gene(gene_starts, anndata_object):
