@@ -4,7 +4,7 @@
 
 `gene_starts` - identifier with what the gene name starts, for eg.: MT- for mitochondrials genes; INPUT: a string
 `anndata_object` - the imported data set in an anndata object with features
-`calc_percentage` - optional argument for calculating ration of gene ids
+`calc_percentage` - optional argument for calculating ratio of gene ids
 """
 
 def _var_names(anndata_object):
@@ -30,7 +30,7 @@ def filter_by_type_gene(gene_starts: str, anndata_object, calc_percentage = Fals
             print(gene_id)
 
     if calc_percentage == True:
-        print(f"Ratio of {gene_starts} genes in dataset: ", _percentage_calc(anndata_object, filtered_ids))
+        print(f"Ratio of {gene_starts} genes in dataset (%):", _percentage_calc(anndata_object, filtered_ids))
 
     if amount == True:
-        print(f"Number of genes starting with {gene_starts}", len(filtered_ids))
+        print(f"Number {gene_starts} genes in dataset:", len(filtered_ids))
