@@ -22,7 +22,7 @@ def _path_spatial_folder(spatial_folder_path):
     file_list = ['tissue_positions_list.csv', 'scalefactors_json.json', 'tissue_hires_image.png']
     new_pathS = []
     for item in file_list:
-        paths = f"{spatial_folder_path}\{item}"
+        paths = f"{spatial_folder_path}/{item}"
         new_path = paths.replace('\\','/')
         new_pathS.append(new_path)
     return new_pathS
