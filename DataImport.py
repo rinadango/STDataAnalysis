@@ -19,7 +19,7 @@ from numpy import asarray
 
 # Paths to coordinate, scale factor and image files
 def _path_spatial_folder(spatial_folder_path):
-    file_list = ['tissue_positions_list.csv', 'scalefactors_json.json', 'tissue_hires_image.png']
+    file_list = ['tissue_positions_list.csv', 'scalefactors_json.json', 'tissue_hires_image.png', 'tissue_lowres_image.png']
     new_pathS = []
     for item in file_list:
         paths = f"{spatial_folder_path}/{item}"
@@ -46,15 +46,20 @@ def _spatial_json(new_pathS):
 # GETTING IMAGE DATA IN NUMPY ARRAY
 def _image_import(new_pathS):
 
+    # hires
     # load the image
     II_image = Image.open(new_pathS[2])
     # convert image to numpy array
     image_data = asarray(II_image)
 
-    return image_data
+    #lowres
+    low_II_image = Image.open(new_pathS[3])
+    low_image_data = asarray(low_II_image)
+
+    return image_data, low_image_data
 
 # Workaround the ANNDATA object
-def _anndata_object_workaround(library_id, data_spatial, coord_df, data_scale, image_data, spatial_folder_path):
+def _anndata_object_workaround(library_id, data_spatial, coord_df, data_scale, image_data, spatial_folder_path, image_type = None, low_image_data = None, both = False):
 
     # Key for ANNDATA .uns and .obsm
     spatial_key = "spatial"
@@ -81,8 +86,19 @@ def _anndata_object_workaround(library_id, data_spatial, coord_df, data_scale, i
     # ADDING SOURCE IMAGE PATH TO ANNDATA.UNS
     data_spatial.uns[spatial_key][library_id]['metadata'] = {'source_image_path': spatial_folder_path}
     
-    # ADDING IMAGE DATA (NUMPY ARRAY) TO ANNDATA.UNS
-    data_spatial.uns[spatial_key][library_id]["images"] = {"hires": image_data}
+    # Want hires or lowres
+    if image_type == "lowres":
+        # ADDING IMAGE DATA (NUMPY ARRAY) TO ANNDATA.UNS
+        data_spatial.uns[spatial_key][library_id]["images"] = {"lowres": image_data}
+    elif image_type == "hires":
+        data_spatial.uns[spatial_key][library_id]["images"] = {"hires": image_data}
+    else:
+        pass
+
+    if both == True:
+        data_spatial.uns[spatial_key][library_id]["images"] = {"hires": image_data, "lowres": low_image_data}
+    else:
+        raise ValueError("Must not be false")
     
     # ADD ['in_tissue','array_row','array_col'] to ANNDATA.OBS
     data_spatial.obs = csv_3colms
@@ -102,7 +118,7 @@ For WIN: it is important to change the `\` to `/` or `\\`, or add `r` at the beg
 ### Only takes high resolution image for now
 """
 
-def spatial_data_importing_raw(library_id, data_path, spatial_folder_path):
+def spatial_data_importing_raw(library_id, data_path, spatial_folder_path, image_type = None, both = False):
     
     # Import matrix, barcodes, features
     data_spatial = sc.read_10x_mtx(data_path)
@@ -118,12 +134,24 @@ def spatial_data_importing_raw(library_id, data_path, spatial_folder_path):
     # Read JSON
     data_scale = _spatial_json(new_pathS)
     
-    # Import image data
-    image_data = _image_import(new_pathS)
+    # HIRES and LOWRES Import image data
+    hi_image_data, low_image_data = _image_import(new_pathS)
     
     # Add everything into ANNDATA object
-    data_spatial = _anndata_object_workaround(library_id, data_spatial, coord_df,
-    data_scale, image_data, spatial_folder_path)
+    if image_type == 'hires' and both == False:
+        data_spatial = _anndata_object_workaround(library_id, data_spatial, coord_df,
+        data_scale, hi_image_data, spatial_folder_path, image_type = 'hires', both = False)
+    elif image_type == 'lowres' and both == False:
+        data_spatial = _anndata_object_workaround(library_id, data_spatial, coord_df,
+        data_scale, low_image_data, spatial_folder_path, image_type = 'lowres', both = False)
+    else:
+        pass
+
+    if both == True and image_type == None:
+        data_spatial = _anndata_object_workaround(library_id, data_spatial, coord_df,
+        data_scale, hi_image_data, spatial_folder_path, low_image_data = low_image_data, both = True)
+    elif both == False and image_type == None:
+        raise ValueError("Parameter 'both' must not be false without specifying image type. Either specify 'both' as True and/or specify image type.")
 
     return data_spatial
 
@@ -143,7 +171,7 @@ For WIN: it is important to change the `\` to `/` or `\\`, or add `r` at the beg
 ### Only takes in high resolution image for now
 """
 
-def spatial_data_importing_filtered(library_id, matrix, barcodes_filtered, feature_file, spatial_folder_path):
+def spatial_data_importing_filtered(library_id, matrix, barcodes_filtered, feature_file, spatial_folder_path, image_type = None, both = False):
  
     ### Import matrix
     data_spatial = sc.read(matrix, cache=True)
@@ -173,10 +201,20 @@ def spatial_data_importing_filtered(library_id, matrix, barcodes_filtered, featu
     data_scale = _spatial_json(new_pathS)
   
     # Import image data
-    image_data = _image_import(new_pathS)
-   
-    # Add everything into ANNDATA object
-    data_spatial = _anndata_object_workaround(library_id, data_spatial, filtered_out_csv,
-    data_scale, image_data, spatial_folder_path)
-    
+    hi_image_data, low_image_data = _image_import(new_pathS)
+
+   # Add everything into ANNDATA object
+    if image_type == 'hires' and both == False:
+        data_spatial = _anndata_object_workaround(library_id, data_spatial, filtered_out_csv,
+        data_scale, hi_image_data, spatial_folder_path, image_type = 'hires', both = False)
+    elif image_type == 'lowres' and both == False:
+        data_spatial = _anndata_object_workaround(library_id, data_spatial, filtered_out_csv,
+        data_scale,  low_image_data, spatial_folder_path, image_type = 'lowres', both = False)
+
+    if both == True and image_type == None:
+        data_spatial = _anndata_object_workaround(library_id, data_spatial, filtered_out_csv,
+        data_scale, hi_image_data, spatial_folder_path, image_type = None, both = True , low_image_data = low_image_data)
+    elif both == False and image_type == None:
+        raise ValueError("Parameter 'both' must not be false without specifying image type. Either specify 'both' as True and/or specify image type.")
+
     return data_spatial
