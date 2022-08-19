@@ -10,7 +10,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import anndata as ad
-import squidpy as sq
 import numpy as np
 
 import json
