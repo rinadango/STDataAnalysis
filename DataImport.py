@@ -97,7 +97,7 @@ def _anndata_object_workaround(library_id, data_spatial, coord_df, data_scale, i
     if both == True:
         data_spatial.uns[spatial_key][library_id]["images"] = {"hires": image_data, "lowres": low_image_data}
     else:
-        raise ValueError("Must not be false")
+        pass
     
     # ADD ['in_tissue','array_row','array_col'] to ANNDATA.OBS
     data_spatial.obs = csv_3colms
@@ -108,6 +108,8 @@ def _anndata_object_workaround(library_id, data_spatial, coord_df, data_scale, i
 `library_id` - ID of the library; INPUT `string`
 `data_path` - file path to the `matrix.mtx.gz`, `barcodes.tsv.gz` and `features.tsv.gz` files folder; INPUT `file path`
 `spatial_folder_path` - path to the `spatial` folder; INPUT `file path`
+`imag_type` - specify either as `lowres` or `hires`
+`both` - True or False
     
 #### Paths can have `\\` or `/` depending on the OS used
 For WIN: it is important to change the `\` to `/` or `\\`, or add `r` at the begining of the `string`. RECOMMENDATION: to add the `r` at the begining of the `string`
@@ -150,7 +152,7 @@ def spatial_data_importing_raw(library_id, data_path, spatial_folder_path, image
         data_spatial = _anndata_object_workaround(library_id, data_spatial, coord_df,
         data_scale, hi_image_data, spatial_folder_path, low_image_data = low_image_data, both = True)
     elif both == False and image_type == None:
-        raise ValueError("Parameter 'both' must not be false without specifying image type. Either specify 'both' as True and/or specify image type.")
+        raise ValueError("Parameter 'both' must not be false without specifying image type. Either specify 'both' as True or specify image type.")
 
     return data_spatial
 
@@ -161,6 +163,8 @@ def spatial_data_importing_raw(library_id, data_path, spatial_folder_path, image
 `feature_file` - features file; INPUT: `file path`; NOT zipped
 `barcodes_filtered`- `barcodes` file taken from the `filtered_count_matrices` folder; INPUT: `file path`; NOT zipped
 `spatial_folder_path` - path to the `spatial` folder; INPUT `file path`
+`imag_type` - specify either as `lowres` or `hires`
+`both` - True or False
 
 #### Paths can have `\\` or `/` depending on the OS used
 For WIN: it is important to change the `\` to `/` or `\\`, or add `r` at the begining of the `string`. RECOMMENDATION: to add the `r` at the begining of the `string`
@@ -214,6 +218,6 @@ def spatial_data_importing_filtered(library_id, matrix, barcodes_filtered, featu
         data_spatial = _anndata_object_workaround(library_id, data_spatial, filtered_out_csv,
         data_scale, hi_image_data, spatial_folder_path, image_type = None, both = True , low_image_data = low_image_data)
     elif both == False and image_type == None:
-        raise ValueError("Parameter 'both' must not be false without specifying image type. Either specify 'both' as True and/or specify image type.")
+        raise ValueError("Parameter 'both' must not be false without specifying image type. Either specify 'both' as True or specify image type.")
 
     return data_spatial
