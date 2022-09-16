@@ -26,21 +26,6 @@ def _path_spatial_folder(spatial_folder_path):
         new_pathS.append(new_path)
     return new_pathS
 
-# Getting the spatial factors
-def _spatial_json(new_pathS):
-    
-    ### Opening JSON file
-    f = open(new_pathS[1])
-  
-    # returns JSON object as 
-    # a dictionary
-    data_scale = json.load(f)
-
-    # Closing file
-    f.close()
-
-    return data_scale
-
 # IMAGE 
 # GETTING IMAGE DATA IN NUMPY ARRAY
 def _image_import(new_pathS):
@@ -56,6 +41,21 @@ def _image_import(new_pathS):
     low_image_data = asarray(low_II_image)
 
     return image_data, low_image_data
+
+# Getting the spatial factors
+def _spatial_json(new_pathS):
+    
+    ### Opening JSON file
+    f = open(new_pathS[1])
+  
+    # returns JSON object as 
+    # a dictionary
+    data_scale = json.load(f)
+
+    # Closing file
+    f.close()
+
+    return data_scale
 
 # Workaround the ANNDATA object
 def _anndata_object_workaround(library_id, data_spatial, coord_df, data_scale, image_data, spatial_folder_path, image_type = None, low_image_data = None, both = False):
