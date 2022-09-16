@@ -114,7 +114,7 @@ def _anndata_object_workaround(library_id, data_spatial, coord_df, data_scale, i
 #### Paths can have `\\` or `/` depending on the OS used
 For WIN: it is important to change the `\` to `/` or `\\`, or add `r` at the begining of the `string`. RECOMMENDATION: to add the `r` at the begining of the `string`
     
-### USE `spatial_data_importing_raw()` only for RAW data
+### USE `spatial_data_importing_raw()` only for data that has `mtx.gz` and `tsv.gz` files.
 
 ### Only takes high resolution image for now
 """
@@ -159,7 +159,7 @@ def spatial_data_importing_raw(library_id, data_path, spatial_folder_path, image
 
 """
 `library_id` - ID of the library; INPUT `string`
-`matrix` - count data file taken from the `filtered_count_matrices` folder; INPUT: `file path`; available extensions `{'tab', 'soft.gz', 'loom', 'mtx', 'anndata', 'h5', 'txt', 'data', 'h5ad', 'csv', 'tsv', 'mtx.gz', 'xlsx'}`
+`matrix` - count data file taken from the `filtered_count_matrices` folder; INPUT: `file path`
 `feature_file` - features file; INPUT: `file path`; NOT zipped
 `barcodes_filtered`- `barcodes` file taken from the `filtered_count_matrices` folder; INPUT: `file path`; NOT zipped
 `spatial_folder_path` - path to the `spatial` folder; INPUT `file path`
@@ -169,9 +169,7 @@ def spatial_data_importing_raw(library_id, data_path, spatial_folder_path, image
 #### Paths can have `\\` or `/` depending on the OS used
 For WIN: it is important to change the `\` to `/` or `\\`, or add `r` at the begining of the `string`. RECOMMENDATION: to add the `r` at the begining of the `string`
     
-### USE `spatial_data_importing_filtered()` only for FILTERED data
-
-### Only takes in high resolution image for now
+### USE `spatial_data_importing_filtered()` only for data that IS a simple tab, space or comma delimited file. Basically for files that are `tsv`, `csv`, `txt` and so on.
 """
 
 def spatial_data_importing_filtered(library_id, matrix, barcodes_filtered, feature_file, spatial_folder_path, image_type = None, both = False):
