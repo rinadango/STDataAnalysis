@@ -114,12 +114,12 @@ def _anndata_object_workaround(library_id, data_spatial, coord_df, data_scale, i
 #### Paths can have `\\` or `/` depending on the OS used
 For WIN: it is important to change the `\` to `/` or `\\`, or add `r` at the begining of the `string`. RECOMMENDATION: to add the `r` at the begining of the `string`
     
-### USE `spatial_data_importing_raw()` only for data that has `mtx.gz` and `tsv.gz` files.
+### USE `spatial_data_importing_complexdata()` only for data that has `mtx.gz` and `tsv.gz` files.
 
-### Only takes high resolution image for now
+### Takes either both high- and low-resolution images, or either
 """
 
-def spatial_data_importing_raw(library_id, data_path, spatial_folder_path, image_type = None, both = False):
+def spatial_data_importing_complexdata(library_id, data_path, spatial_folder_path, image_type = None, both = False):
     
     # Import matrix, barcodes, features
     data_spatial = sc.read_10x_mtx(data_path)
@@ -169,10 +169,10 @@ def spatial_data_importing_raw(library_id, data_path, spatial_folder_path, image
 #### Paths can have `\\` or `/` depending on the OS used
 For WIN: it is important to change the `\` to `/` or `\\`, or add `r` at the begining of the `string`. RECOMMENDATION: to add the `r` at the begining of the `string`
     
-### USE `spatial_data_importing_filtered()` only for data that IS a simple tab, space or comma delimited file. Basically for files that are `tsv`, `csv`, `txt` and so on.
+### USE `spatial_data_importing_simpledata()` only for data that IS a simple tab, space or comma delimited file. Basically for files that are `tsv`, `csv`, `txt` and so on.
 """
 
-def spatial_data_importing_filtered(library_id, matrix, barcodes_filtered, feature_file, spatial_folder_path, image_type = None, both = False):
+def spatial_data_importing_simpledata(library_id, matrix, barcodes_filtered, feature_file, spatial_folder_path, image_type = None, both = False):
  
     ### Import matrix
     data_spatial = sc.read(matrix, cache=True)
