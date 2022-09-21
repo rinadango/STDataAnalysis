@@ -7,8 +7,8 @@ Read comments of each `.py` for more instructions
 
 ## DataImport.py
 
-USE `spatial_data_importing_raw` only for data files that are `mtx.gz`, `tsv.gz` or other more complex files. <br>
-USE `spatial_data_importing_filtered` only for data files that are simple tab, space or comma delimited files. Basically for files that are `tsv`, `csv`, `txt` and so on.
+USE `spatial_data_importing_complexdata` only for data files that are `mtx.gz`, `tsv.gz` or other more complex files. <br>
+USE `spatial_data_importing_simpledata` only for data files that are simple tab, space or comma delimited files. Basically for files that are `tsv`, `csv`, `txt` and so on.
 
 ## FilterBYName.py
 
