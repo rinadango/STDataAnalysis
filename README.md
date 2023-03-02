@@ -1,6 +1,6 @@
 # Usage
 
-<b>Important</b>: must have scanpy and anndata installed for `DataImport.py`<p>
+<b>Important</b>: must have `scanpy` and `anndata` installed<p>
 Add the folder where you will use it as import for other code<br>
 Import main module as: `from STDataAnalysis import <.py file name>`<p>
 Read comments of each `.py` for more instructions
