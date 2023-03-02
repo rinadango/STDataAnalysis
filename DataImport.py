@@ -2,7 +2,7 @@
 """
 @author: Paulina Frolovaite
 
-Two main methods: spatial_data_importing_raw() and spatial_data_importing_filtered
+Two main methods: spatial_data_importing_complexdata() and spatial_data_importing_simpledata
 """
 
 import scanpy as sc
@@ -105,18 +105,21 @@ def _anndata_object_workaround(library_id, data_spatial, coord_df, data_scale, i
     return data_spatial
 
 """
-`library_id` - ID of the library; INPUT `string`
-`data_path` - file path to the `matrix.mtx.gz`, `barcodes.tsv.gz` and `features.tsv.gz` files folder; INPUT `file path`
-`spatial_folder_path` - path to the `spatial` folder; INPUT `file path`
-`imag_type` - specify either as `lowres` or `hires`
-`both` - True or False
-    
-#### Paths can have `\\` or `/` depending on the OS used
-For WIN: it is important to change the `\` to `/` or `\\`, or add `r` at the begining of the `string`. RECOMMENDATION: to add the `r` at the begining of the `string`
-    
-### USE `spatial_data_importing_complexdata()` only for data that has `mtx.gz` and `tsv.gz` files.
+USE `spatial_data_importing_complexdata()` only for data that has `mtx.gz` and `tsv.gz` files.
 
-### Takes either both high- and low-resolution images, or either
+Args:
+    library_id: ID of the library; INPUT `string`
+    data_path: file path to the `matrix.mtx.gz`, `barcodes.tsv.gz` and `features.tsv.gz` files folder. INPUT is a `file path`
+    spatial_folder_path: path to the `spatial` folder; INPUT `file path`
+    imag_type: specify either as `lowres` or `hires`
+    both: True or False
+Returns:
+    data_spatial: ANNDATA object
+    
+Paths can have `\\` or `/` depending on the OS used
+For WIN: it is important to change the `\` to `/` or `\\`, or add `r` at the begining of the `string`. RECOMMENDATION: to add the `r` at the begining of the `string`
+
+Takes either both high- and low-resolution images, or either
 """
 
 def spatial_data_importing_complexdata(library_id, data_path, spatial_folder_path, image_type = None, both = False):
@@ -157,23 +160,27 @@ def spatial_data_importing_complexdata(library_id, data_path, spatial_folder_pat
     return data_spatial
 
 
-"""
-`library_id` - ID of the library; INPUT `string`
-`matrix` - count data file taken from the `filtered_count_matrices` folder; INPUT: `file path`
-`feature_file` - features file; INPUT: `file path`; NOT zipped
-`barcodes_filtered`- `barcodes` file taken from the `filtered_count_matrices` folder; INPUT: `file path`; NOT zipped
-`spatial_folder_path` - path to the `spatial` folder; INPUT `file path`
-`imag_type` - specify either as `lowres` or `hires`
-`both` - True or False
-
-#### Paths can have `\\` or `/` depending on the OS used
-For WIN: it is important to change the `\` to `/` or `\\`, or add `r` at the begining of the `string`. RECOMMENDATION: to add the `r` at the begining of the `string`
-    
-### USE `spatial_data_importing_simpledata()` only for data that IS a simple tab, space or comma delimited file. Basically for files that are `tsv`, `csv`, `txt` and so on.
-"""
-
 def spatial_data_importing_simpledata(library_id, matrix, barcodes_filtered, feature_file, spatial_folder_path, image_type = None, both = False):
- 
+    
+    """
+    USE `spatial_data_importing_simpledata()` only for data that IS a simple tab, space or comma delimited file. Basically for files that are `tsv`, `csv`, `txt` and so on.
+
+    Args:
+        library_id: ID of the library; INPUT `string`
+        matrix: count data file taken from the `filtered_count_matrices` folder. INPUT is`file path`
+        feature_file: features file; INPUT: `file path`; NOT zipped
+        barcodes_filtered: `barcodes` file taken from the `filtered_count_matrices` folder. INPUT is a `file path`. NOT zipped
+        spatial_folder_path: path to the `spatial` folder. INPUT is a `file path`
+        imag_type: specify either as `lowres` or `hires`
+        both: True or False
+    Returns:
+        data_spatial: ANNDATA object
+
+    Paths can have `\\` or `/` depending on the OS used
+    
+    For WIN: it is important to change the `\` to `/` or `\\`, or add `r` at the begining of the `string`. RECOMMENDATION: to add the `r` at the begining of the `string`
+    """
+
     ### Import matrix
     data_spatial = sc.read(matrix, cache=True)
     # Fix shape
@@ -219,3 +226,4 @@ def spatial_data_importing_simpledata(library_id, matrix, barcodes_filtered, fea
         raise ValueError("Parameter 'both' must not be false without specifying image type. Either specify 'both' as True or specify image type.")
 
     return data_spatial
+
